@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тест: прямоугольник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#24308A; --ink-soft:#5A64B0; --paper:#FFFFFF; --grid:#D9E4F2;
+  --coral:#FF5C7A; --mint:#16B8A6; --marker:#FFE066; --sky:#EAF1FB;
+  --ok:#14A37F; --bad:#E2435E; --text:#1D2340;
+  --hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
+  --ui:"Rubik",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:var(--ui);color:var(--text);font-size:17px;line-height:1.5;
+  background-color:#F7FAFF;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+.hidden{display:none!important}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:18px;padding:28px;box-shadow:6px 6px 0 var(--ink)}
+h1{font-family:var(--hand);font-weight:700;font-size:clamp(44px,8vw,64px);line-height:1;margin:0 0 6px;color:var(--ink)}
+.lead{margin:0 0 18px;color:#4A5070;max-width:60ch}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px;padding:0;list-style:none}
+.facts li{background:var(--sky);border-radius:999px;padding:6px 14px;font-size:15px;color:var(--ink)}
+label{display:block;font-weight:500;margin-bottom:6px}
+input[type=text]{width:100%;font:inherit;font-size:18px;padding:12px 14px;border:2px solid var(--ink);border-radius:12px;outline:none}
+input[type=text]:focus{box-shadow:0 0 0 4px var(--marker)}
+.btn{font:inherit;font-weight:700;font-size:17px;border:2px solid var(--ink);border-radius:12px;padding:12px 22px;cursor:pointer;background:var(--paper);color:var(--ink);transition:transform .08s}
+.btn:active{transform:translate(2px,2px)}
+.btn.main{background:var(--coral);color:#fff;box-shadow:3px 3px 0 var(--ink)}
+.btn.main:disabled{background:#C9CCDA;box-shadow:none;cursor:not-allowed}
+.btn:focus-visible,.opt:focus-visible,.dot:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.err{color:var(--bad);font-size:15px;min-height:22px;margin:6px 0 10px}
+
+/* hero line */
+.hero-line{width:100%;max-width:520px;display:block;margin:6px 0 18px}
+.draw{stroke-dasharray:480;stroke-dashoffset:480;animation:draw 1.1s ease-out .3s forwards}
+.draw.d2{animation-delay:1s}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:5;background:rgba(247,250,255,.94);backdrop-filter:blur(4px);padding:12px 0 10px;margin-bottom:14px}
+.bar-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.who{font-family:var(--hand);font-size:28px;color:var(--ink);line-height:1}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:20px;color:var(--ink);background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:4px 14px;min-width:96px;text-align:center}
+.timer.low{background:var(--coral);color:#fff;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.progress{height:14px;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:var(--paper)}
+.progress span{display:block;height:100%;width:0;background:repeating-linear-gradient(-55deg,var(--mint) 0 5px,#fff 5px 9px);transition:width .3s}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.dot{width:30px;height:30px;border-radius:8px;border:2px solid var(--ink);background:var(--paper);font:inherit;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;padding:0}
+.dot.done{background:var(--marker)}
+.dot.cur{background:var(--ink);color:#fff}
+
+/* question */
+.qnum{font-family:var(--hand);font-size:26px;color:var(--coral);margin:0 0 4px}
+.qtext{font-size:20px;font-weight:500;margin:0 0 14px}
+.pic{background:var(--sky);border-radius:14px;padding:10px 12px;margin:0 0 16px}
+.pic svg{width:100%;max-width:420px;display:block;margin:0 auto}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+@media (max-width:560px){.opts{grid-template-columns:1fr}.card{padding:20px}}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-size:19px;background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--text);min-height:62px}
+.opt:hover{background:#F3F6FF}
+.opt .lt{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-size:15px;font-weight:700;color:var(--ink)}
+.opt.sel{background:var(--marker);box-shadow:3px 3px 0 var(--ink)}
+.opt.sel .lt{background:var(--ink);color:#fff}
+.opt > span:last-child{flex:1;min-width:0}
+.opt svg{width:100%;max-width:300px;display:block}
+.nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.m{font-variant-numeric:tabular-nums;white-space:nowrap}
+.sys{display:inline-flex;align-items:center;gap:.15em;vertical-align:middle;margin:0 .2em}
+.sys .br{font-size:2.5em;line-height:1;font-weight:400;color:var(--ink)}
+.sys .rows{display:flex;flex-direction:column;line-height:1.35}
+
+/* results */
+.score{font-family:var(--hand);font-weight:700;font-size:clamp(70px,16vw,110px);line-height:.9;color:var(--ink);margin:4px 0}
+.score small{font-size:.45em;color:var(--ink-soft)}
+.verdict{font-size:19px;margin:0 0 16px}
+.send{border-radius:14px;padding:14px 16px;margin:0 0 22px;background:var(--sky);font-size:16px}
+.send.ok{background:#DDF6EE;color:#0B6B53}
+.send.fail{background:#FFE8EC}
+.send .row{margin-top:10px}
+.review{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.review li{border:2px solid var(--grid);border-left:8px solid var(--ok);border-radius:12px;padding:12px 14px;background:var(--paper)}
+.review li.no{border-left-color:var(--bad)}
+.review .h{font-weight:700;margin-bottom:4px}
+.review .ex{color:#4A5070;font-size:15px;margin-top:6px}
+h2{font-family:var(--hand);font-size:36px;color:var(--ink);margin:26px 0 10px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hA" width="7" height="16" patternUnits="userSpaceOnUse" patternTransform="skewX(-38)"><rect width="2.2" height="16" fill="#FF5C7A"/></pattern>
+    <pattern id="hB" width="7" height="16" patternUnits="userSpaceOnUse" patternTransform="skewX(-38)"><rect width="2.2" height="16" fill="#16B8A6"/></pattern>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <!-- START -->
+  <section id="start" class="card">
+    <svg class="hero-line" viewBox="0 0 520 150" aria-hidden="true">
+      <rect x="40" y="20" width="440" height="110" fill="#fff" stroke="#24308A" stroke-width="3"/>
+      <line class="draw" x1="40" y1="130" x2="480" y2="20" stroke="#FF5C7A" stroke-width="3"/>
+      <line class="draw d2" x1="40" y1="20" x2="480" y2="130" stroke="#16B8A6" stroke-width="3"/>
+      <polyline points="40,34 54,34 54,20" fill="none" stroke="#24308A" stroke-width="2"/>
+      <polyline points="466,20 466,34 480,34" fill="none" stroke="#24308A" stroke-width="2"/>
+      <polyline points="40,116 54,116 54,130" fill="none" stroke="#24308A" stroke-width="2"/>
+      <polyline points="466,130 466,116 480,116" fill="none" stroke="#24308A" stroke-width="2"/>
+      <circle cx="260" cy="75" r="5" fill="#24308A"/>
+      <text x="24" y="146" font-family="Rubik,Arial" font-style="italic" font-size="18" fill="#24308A">A</text>
+      <text x="24" y="20" font-family="Rubik,Arial" font-style="italic" font-size="18" fill="#24308A">B</text>
+      <text x="486" y="20" font-family="Rubik,Arial" font-style="italic" font-size="18" fill="#24308A">C</text>
+      <text x="486" y="146" font-family="Rubik,Arial" font-style="italic" font-size="18" fill="#24308A">D</text>
+    </svg>
+    <h1>Прямоугольник</h1>
+    <p class="lead">Определение, признаки и свойства прямоугольника, задачи на периметр, диагонали и биссектрисы. Решай на черновике и выбирай один ответ. Можно возвращаться к прошлым вопросам, пока идёт время.</p>
+    <ul class="facts">
+      <li>17 вопросов</li><li>30 минут</li><li>нужен черновик</li><li>результат уйдёт учителю</li>
+    </ul>
+    <label for="name">Имя и фамилия</label>
+    <input id="name" type="text" autocomplete="name" placeholder="Например, Анна Петрова">
+    <div class="err" id="nameErr"></div>
+    <button class="btn main" id="go">Начать тест</button>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hidden">
+    <div class="bar">
+      <div class="bar-top">
+        <div class="who" id="who"></div>
+        <div class="timer" id="timer" aria-live="polite">30:00</div>
+      </div>
+      <div class="progress" aria-hidden="true"><span id="prog"></span></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="card">
+      <p class="qnum" id="qnum"></p>
+      <div class="qtext" id="qtext"></div>
+      <div class="pic hidden" id="qpic"></div>
+      <div class="opts" id="opts"></div>
+      <div class="nav">
+        <button class="btn" id="prev">Назад</button>
+        <div class="row">
+          <button class="btn" id="next">Дальше</button>
+          <button class="btn main" id="finish">Завершить тест</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="hidden">
+    <div class="card">
+      <p class="qnum" id="rName"></p>
+      <div class="score" id="rScore"></div>
+      <p class="verdict" id="rVerdict"></p>
+      <div class="send" id="send"></div>
+    </div>
+    <h2>Разбор ответов</h2>
+    <ol class="review" id="review"></ol>
+  </section>
+</div>
+
+<script>
+const TEACHER = "pasha_viarenich@mail.ru";
+const LIMIT = 30 * 60;
+const INF = Infinity;
+
+/* ---------- helpers ---------- */
+const fmt = v => (v < 0 ? "−" : "") + String(Math.abs(v)).replace(".", ",");
+const m = s => `<span class="m">${s}</span>`;
+function sys(rows, kind) {
+  return `<span class="sys"><span class="br">${kind === "or" ? "[" : "{"}</span><span class="rows">${rows.map(r => `<span>${r}</span>`).join("")}</span></span>`;
+}
+/* number line: lines = [{a,b,ia,ib}] ; a/b may be ±INF */
+function nl(lines) {
+  const W = 340, LH = 52;
+  const vals = [...new Set(lines.flatMap(l => [l.a, l.b].filter(Number.isFinite)))].sort((p, q) => p - q);
+  const pos = {};
+  vals.forEach((v, i) => pos[v] = vals.length === 1 ? 170 : 85 + i * (170 / (vals.length - 1)));
+  let s = `<svg viewBox="0 0 ${W} ${LH * lines.length + 4}" role="img" aria-label="Числовая прямая">`;
+  lines.forEach((l, k) => {
+    const y = k * LH + 28;
+    const x1 = Number.isFinite(l.a) ? pos[l.a] : 16, x2 = Number.isFinite(l.b) ? pos[l.b] : 300;
+    s += `<rect x="${x1}" y="${y - 17}" width="${x2 - x1}" height="15" fill="url(#${k % 2 ? "hB" : "hA"})"/>`;
+    s += `<line x1="10" y1="${y}" x2="318" y2="${y}" stroke="#24308A" stroke-width="2"/><polygon points="318,${y - 5} 330,${y} 318,${y + 5}" fill="#24308A"/>`;
+    s += `<text x="322" y="${y + 20}" font-family="Rubik,Arial" font-style="italic" font-size="15" fill="#24308A">x</text>`;
+    [[l.a, l.ia], [l.b, l.ib]].forEach(([v, inc]) => {
+      if (!Number.isFinite(v)) return;
+      s += `<circle cx="${pos[v]}" cy="${y}" r="5.5" fill="${inc ? "#24308A" : "#fff"}" stroke="#24308A" stroke-width="2"/>`;
+      s += `<text x="${pos[v]}" y="${y + 21}" text-anchor="middle" font-family="Rubik,Arial" font-size="15" fill="#24308A">${fmt(v)}</text>`;
+    });
+  });
+  return s + "</svg>";
+}
+const o = (h, s) => ({ h, s: s || h.replace(/<[^>]+>/g, "") });
+const iv = s => o(m(s), s);
+
+/* ---------- drawings ---------- */
+const INK = "#24308A", CO = "#FF5C7A", MI = "#16B8A6";
+const S = (w, h, inner) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Рисунок к задаче">${inner}</svg>`;
+const T = (x, y, s, c = INK, it = true) => `<text x="${x}" y="${y}" font-family="Rubik,Arial" font-size="16" ${it ? 'font-style="italic"' : ""} fill="${c}" text-anchor="middle">${s}</text>`;
+const Ln = (a, b, c = INK, w = 2.2, dash = "") => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${w}" ${dash ? `stroke-dasharray="${dash}"` : ""} stroke-linecap="round"/>`;
+const Dot = (p, c = INK) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${c}"/>`;
+function rect(A, B, C, D) {
+  return `<polygon points="${[A, B, C, D].map(p => p.join(",")).join(" ")}" fill="#fff" stroke="${INK}" stroke-width="2.4"/>` +
+    T(A[0] - 14, A[1] + 18, "A") + T(B[0] - 14, B[1] - 6, "B") + T(C[0] + 14, C[1] - 6, "C") + T(D[0] + 14, D[1] + 18, "D");
+}
+const fig = {
+  diag: S(360, 210, (() => { const A = [60, 170], B = [60, 50], C = [300, 50], D = [300, 170], O = [180, 110];
+    return rect(A, B, C, D) + Ln(A, C, CO) + Ln(B, D, CO) + Dot(O) + T(180, 136, "O"); })()),
+  bis: S(330, 180, (() => { const A = [40, 150], B = [40, 45], M = [145, 45], C = [285, 45], D = [285, 150];
+    return rect(A, B, C, D) + Ln(A, M, MI, 2.6) + Dot(M) + T(145, 33, "M") + T(92, 64, "6", CO, false) + T(215, 64, "8", CO, false); })()),
+  d60: S(360, 230, (() => { const A = [50, 195], B = [50, 45], C = [310, 45], D = [310, 195];
+    return rect(A, B, C, D) + Ln(A, C, CO) + Ln(B, D, CO) + T(284, 86, "60°", CO, false) + T(34, 124, "9", CO, false); })()),
+  bis2: S(360, 180, (() => { const A = [45, 150], B = [45, 60], C = [315, 60], D = [315, 150], M = [135, 60], N = [225, 60];
+    return rect(A, B, C, D) + Ln(A, M, MI, 2.6) + Ln(D, N, MI, 2.6) + Dot(M) + Dot(N) + T(135, 48, "M") + T(225, 48, "N") +
+      [90, 180, 270].map(x => Ln([x, 53], [x, 67], CO, 2.4)).join(""); })()),
+  mid: S(360, 200, (() => { const A = [80, 170], B = [80, 70], C = [280, 70], D = [280, 170], M = [180, 170];
+    return rect(A, B, C, D) + Ln(B, M, MI, 2.6) + Ln(M, C, MI, 2.6) + `<polygon points="180,170 172,162 180,154 188,162" fill="none" stroke="${CO}" stroke-width="2"/>` +
+      Dot(M) + T(180, 192, "M") + T(64, 124, "5", CO, false); })()),
+  tri: S(360, 215, (() => { const C = [50, 190], A = [50, 40], B = [320, 190], K = [113.7, 75.4], M = [50, 75.4], N = [113.7, 190];
+    return `<polygon points="50,190 50,40 320,190" fill="#fff" stroke="${INK}" stroke-width="2.4"/>` +
+      `<polyline points="50,178 62,178 62,190" fill="none" stroke="${INK}" stroke-width="1.6"/>` +
+      Ln(C, K, CO, 2.4) + Ln(K, M, MI, 2.4) + Ln(K, N, MI, 2.4) + Ln(M, N, CO, 2, "6 5") +
+      [K, M, N].map(p => Dot(p)).join("") +
+      T(36, 206, "C") + T(36, 40, "A") + T(334, 206, "B") + T(124, 68, "K") + T(34, 80, "M") + T(114, 208, "N"); })()),
+  o60: S(350, 210, (() => { const A = [70, 175], B = [70, 55], C = [278, 55], D = [278, 175], O = [174, 115];
+    return rect(A, B, C, D) + Ln(A, C, CO) + Ln(B, D, CO) + Dot(O) + T(174, 140, "O") + T(140, 121, "60°", CO, false) + T(54, 120, "7", CO, false); })()),
+  a25: S(360, 200, (() => { const A = [50, 170], B = [50, 49], C = [310, 49], D = [310, 170], O = [180, 109.5];
+    return rect(A, B, C, D) + Ln(A, C, CO) + Ln(B, D, CO) + Dot(O) + T(180, 98, "O") + T(104, 163, "25°", CO, false); })()),
+};
+
+/* ---------- questions (first option is correct) ---------- */
+const Q = [
+  { t: "Что называется прямоугольником?",
+    opts: [o("Параллелограмм, у которого все углы прямые"), o("Четырёхугольник, у которого все стороны равны"), o("Параллелограмм, у которого все стороны равны"), o("Четырёхугольник, у которого две стороны параллельны")],
+    ex: "Прямоугольник — это параллелограмм, у которого все углы прямые. Параллелограмм с равными сторонами — это ромб." },
+  { t: "Укажи верное утверждение.",
+    opts: [o("Если в четырёхугольнике три прямых угла, то он прямоугольник"), o("Если в выпуклом четырёхугольнике диагонали равны, то он прямоугольник"), o("Если в четырёхугольнике есть прямой угол, то он прямоугольник"), o("Если диагонали параллелограмма перпендикулярны, то он прямоугольник")],
+    ex: "Это второй признак прямоугольника: четвёртый угол тогда тоже равен 360° − 3 · 90° = 90°. Равные диагонали бывают и у равнобедренной трапеции, а перпендикулярные — у ромба." },
+  { t: "Какое утверждение верно НЕ для каждого прямоугольника?",
+    opts: [o("Диагонали перпендикулярны"), o("Диагонали равны"), o("Диагонали точкой пересечения делятся пополам"), o("Противоположные стороны равны и параллельны")],
+    ex: "Диагонали прямоугольника равны и делятся пополам, но перпендикулярны они только у квадрата." },
+  { t: `В параллелограмме ${m("ABCD")} диагонали ${m("AC = BD = 10 см")}. Что можно сказать о нём?`,
+    opts: [o("Это прямоугольник: у параллелограмма равны диагонали"), o("Это ромб: диагонали равны"), o("Ничего, нужно знать углы"), o("Это прямоугольник: противоположные стороны равны")],
+    ex: "Первый признак: если у параллелограмма диагонали равны, то это прямоугольник. Равенство противоположных сторон есть у любого параллелограмма." },
+  { t: `В прямоугольнике ${m("ABCD")} диагональ ${m("AC = 14 см")}, ${m("O")} — точка пересечения диагоналей. Найди ${m("BO")}.`,
+    pic: fig.diag,
+    opts: [iv("7 см"), iv("14 см"), iv("3,5 см"), iv("28 см")],
+    ex: "Диагонали прямоугольника равны: BD = AC = 14 см. Точкой пересечения они делятся пополам: BO = 14 : 2 = 7 см." },
+  { t: `Периметр треугольника ${m("AOB")} равен ${m("20 см")}, ${m("AB = 6 см")}, где ${m("O")} — точка пересечения диагоналей прямоугольника ${m("ABCD")}. Найди диагональ ${m("AC")}.`,
+    pic: fig.diag,
+    opts: [iv("14 см"), iv("7 см"), iv("20 см"), iv("26 см")],
+    ex: "AO + BO = 20 − 6 = 14 см. Так как AO = BO (половины равных диагоналей), AO = 7 см, а AC = 2 · 7 = 14 см." },
+  { t: `Периметр прямоугольника ${m("80 см")}, одна сторона на ${m("6 см")} меньше другой. Найди стороны.`,
+    opts: [iv("17 см и 23 см"), iv("37 см и 43 см"), iv("20 см и 26 см"), iv("16 см и 24 см")],
+    ex: "Сумма двух смежных сторон — половина периметра: 40 см. x + (x − 6) = 40, 2x = 46, x = 23. Стороны 23 и 17 см." },
+  { t: `Периметр прямоугольника ${m("80 см")}, одна сторона в ${m("4")} раза больше другой. Найди стороны.`,
+    opts: [iv("8 см и 32 см"), iv("16 см и 64 см"), iv("10 см и 40 см"), iv("4 см и 16 см")],
+    ex: "x + 4x = 40, 5x = 40, x = 8. Стороны 8 и 32 см." },
+  { t: `Периметр прямоугольника ${m("80 см")}, стороны относятся как ${m("3 : 7")}. Найди стороны.`,
+    opts: [iv("12 см и 28 см"), iv("24 см и 56 см"), iv("3 см и 7 см"), iv("15 см и 25 см")],
+    ex: "3x + 7x = 40, 10x = 40, x = 4. Стороны 3 · 4 = 12 и 7 · 4 = 28 см." },
+  { t: `Биссектриса угла ${m("A")} прямоугольника ${m("ABCD")} делит сторону ${m("BC")} на отрезки ${m("BM = 6 см")} и ${m("MC = 8 см")}. Найди периметр.`,
+    pic: fig.bis,
+    opts: [iv("40 см"), iv("28 см"), iv("34 см"), iv("48 см")],
+    ex: "∠BMA = ∠MAD как накрест лежащие, а ∠MAD = ∠BAM, потому что AM — биссектриса. Значит, треугольник ABM равнобедренный: AB = BM = 6 см. BC = 6 + 8 = 14 см, P = (6 + 14) · 2 = 40 см." },
+  { t: `В прямоугольнике ${m("ABCD")} сторона ${m("AB = 9 см")}, угол между диагональю ${m("AC")} и стороной ${m("CD")} равен ${m("60°")}. Найди ${m("BD")}.`,
+    pic: fig.d60,
+    opts: [iv("18 см"), iv("9 см"), iv("4,5 см"), iv("27 см")],
+    ex: "В треугольнике ACD ∠D = 90°, ∠C = 60°, значит ∠CAD = 30°. Катет CD = AB = 9 см лежит против угла 30°, поэтому AC = 2 · 9 = 18 см. Диагонали равны: BD = 18 см." },
+  { t: `Угол между диагоналями прямоугольника равен ${m("60°")}, меньшая сторона ${m("7 см")}. Найди диагональ.`,
+    pic: fig.o60,
+    opts: [iv("14 см"), iv("7 см"), iv("21 см"), iv("28 см")],
+    ex: "AO = BO, а ∠AOB = 60°, значит треугольник AOB равносторонний: AO = AB = 7 см. Диагональ AC = 2 · 7 = 14 см." },
+  { t: `В прямоугольнике ${m("ABCD")} угол ${m("∠CAD = 25°")}. Найди угол ${m("∠AOB")} между диагоналями.`,
+    pic: fig.a25,
+    opts: [iv("50°"), iv("130°"), iv("25°"), iv("65°")],
+    ex: "AO = OD, поэтому треугольник AOD равнобедренный: ∠ODA = ∠OAD = 25°, ∠AOD = 180° − 50° = 130°. Угол AOB смежный с ним: 180° − 130° = 50°." },
+  { t: `В прямоугольнике диагональ делит угол в отношении ${m("1 : 2")}, меньшая сторона равна ${m("12")}. Найди диагональ.`,
+    opts: [iv("24"), iv("18"), iv("36"), iv("6")],
+    ex: "Прямой угол делится на 30° и 60°. Меньшая сторона лежит против угла 30° в прямоугольном треугольнике, где диагональ — гипотенуза. Значит, диагональ = 2 · 12 = 24." },
+  { t: `Точка ${m("M")} — середина стороны ${m("AD")} прямоугольника ${m("ABCD")}, ${m("BM ⊥ MC")}, ${m("AB = 5")}. Найди периметр прямоугольника.`,
+    pic: fig.mid,
+    opts: [iv("30"), iv("20"), iv("25"), iv("40")],
+    ex: "Треугольники ABM и DCM равны (AB = CD, AM = MD), поэтому ∠AMB = ∠DMC = (180° − 90°) : 2 = 45°. Треугольник ABM равнобедренный: AM = AB = 5, AD = 10. P = (5 + 10) · 2 = 30." },
+  { t: `Биссектрисы углов ${m("A")} и ${m("D")} прямоугольника ${m("ABCD")} делят сторону ${m("BC")} на три равные части по ${m("6")}. Найди периметр.`,
+    pic: fig.bis2,
+    opts: [iv("48 или 60"), iv("48"), iv("60"), iv("36")],
+    ex: "BC = 18. Биссектриса отсекает равнобедренный треугольник, поэтому AB равна отрезку от B до точки, куда пришла биссектриса угла A. Если она пришла в M: AB = 6, P = (6 + 18) · 2 = 48. Если биссектрисы пересекаются внутри и угол A приходит в N: AB = 12, P = (12 + 18) · 2 = 60. Возможны оба случая." },
+  { t: `В прямоугольном треугольнике ${m("ABC")} из вершины прямого угла ${m("C")} проведена высота ${m("CK = 5")}. Из ${m("K")} проведены перпендикуляры ${m("KM")} и ${m("KN")} к катетам. Найди ${m("MN")}.`,
+    pic: fig.tri,
+    opts: [iv("5"), iv("10"), iv("2,5"), iv("5√2")],
+    ex: "У четырёхугольника CMKN три прямых угла (C, M, N), значит это прямоугольник. CK и MN — его диагонали, а они равны: MN = CK = 5." },
+];
+
+/* shuffle options once */
+Q.forEach(q => {
+  q.order = q.opts.map((_, i) => i).sort(() => Math.random() - .5);
+});
+
+/* ---------- state ---------- */
+let cur = 0, answers = Array(Q.length).fill(null), left = LIMIT, tick = null, leaves = 0, started = 0, name = "", done = false;
+const $ = id => document.getElementById(id);
+const LETTERS = ["а", "б", "в", "г"];
+
+$("go").onclick = () => {
+  name = $("name").value.trim();
+  if (name.length < 2) { $("nameErr").textContent = "Впиши имя и фамилию, чтобы учитель увидел, чей это результат."; $("name").focus(); return; }
+  $("start").classList.add("hidden"); $("quiz").classList.remove("hidden");
+  $("who").textContent = name;
+  started = Date.now();
+  buildDots(); show(0);
+  tick = setInterval(() => {
+    left = LIMIT - Math.floor((Date.now() - started) / 1000);
+    if (left <= 0) { left = 0; renderTimer(); finish(true); return; }
+    renderTimer();
+  }, 500);
+};
+$("name").addEventListener("keydown", e => { if (e.key === "Enter") $("go").click(); });
+
+document.addEventListener("visibilitychange", () => { if (document.hidden && started && !done) leaves++; });
+
+function renderTimer() {
+  const mm = String(Math.floor(left / 60)).padStart(2, "0"), ss = String(left % 60).padStart(2, "0");
+  $("timer").textContent = `⏱ ${mm}:${ss}`;
+  $("timer").classList.toggle("low", left <= 180);
+}
+function buildDots() {
+  $("dots").innerHTML = Q.map((_, i) => `<button class="dot" data-i="${i}" aria-label="Вопрос ${i + 1}">${i + 1}</button>`).join("");
+  $("dots").onclick = e => { const b = e.target.closest(".dot"); if (b) show(+b.dataset.i); };
+}
+function show(i) {
+  cur = i; const q = Q[i];
+  $("qnum").textContent = `Вопрос ${i + 1} из ${Q.length}`;
+  $("qtext").innerHTML = q.t;
+  $("qpic").innerHTML = q.pic || ""; $("qpic").classList.toggle("hidden", !q.pic);
+  $("opts").innerHTML = q.order.map((oi, k) =>
+    `<button class="opt${answers[i] === oi ? " sel" : ""}" data-oi="${oi}" aria-pressed="${answers[i] === oi}"><span class="lt">${LETTERS[k]}</span><span>${q.opts[oi].h}</span></button>`).join("");
+  $("prev").disabled = i === 0;
+  $("next").classList.toggle("hidden", i === Q.length - 1);
+  refreshBar();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+$("opts").onclick = e => {
+  const b = e.target.closest(".opt"); if (!b) return;
+  answers[cur] = +b.dataset.oi;
+  [...$("opts").children].forEach(x => { const on = x === b; x.classList.toggle("sel", on); x.setAttribute("aria-pressed", on); });
+  refreshBar();
+};
+$("prev").onclick = () => cur > 0 && show(cur - 1);
+$("next").onclick = () => cur < Q.length - 1 && show(cur + 1);
+$("finish").onclick = () => {
+  const empty = answers.filter(a => a === null).length;
+  if (empty && !confirm(`Без ответа осталось вопросов: ${empty}. Всё равно завершить тест?`)) return;
+  finish(false);
+};
+function refreshBar() {
+  const n = answers.filter(a => a !== null).length;
+  $("prog").style.width = (n / Q.length * 100) + "%";
+  [...$("dots").children].forEach((d, i) => { d.classList.toggle("done", answers[i] !== null); d.classList.toggle("cur", i === cur); });
+}
+
+/* ---------- finish ---------- */
+let report = "", subject = "";
+function finish(timeout) {
+  if (done) return; done = true; clearInterval(tick);
+  const spent = Math.min(LIMIT, Math.round((Date.now() - started) / 1000));
+  const score = answers.filter((a, i) => a === 0).length;
+  const pct = Math.round(score / Q.length * 100);
+  const t = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
+  $("quiz").classList.add("hidden"); $("result").classList.remove("hidden");
+  $("rName").textContent = name + (timeout ? " · время вышло" : "");
+  $("rScore").innerHTML = `${score}<small> / ${Q.length}</small>`;
+  $("rVerdict").textContent = pct >= 90 ? "Отлично! Прямоугольник тебе покорился." :
+    pct >= 70 ? "Хорошо! Посмотри разбор ошибок ниже." :
+    pct >= 50 ? "Неплохо, но тему стоит повторить: разбор ниже." : "Тему нужно повторить. Внимательно прочитай разбор.";
+
+  const lines = Q.map((q, i) => {
+    const a = answers[i], ok = a === 0;
+    return `${i + 1}. ${ok ? "✓" : "✗"} ${ok ? q.opts[0].s : `ответ: ${a === null ? "нет ответа" : q.opts[a].s}; верно: ${q.opts[0].s}`}`;
+  });
+  subject = `Тест «Прямоугольник»: ${name} — ${score}/${Q.length}`;
+  report = [
+    `Ученица: ${name}`,
+    `Результат: ${score} из ${Q.length} (${pct}%)`,
+    `Время: ${t(spent)} из ${t(LIMIT)}${timeout ? " (время вышло)" : ""}`,
+    `Уходила со страницы: ${leaves} раз(а)`,
+    `Дата: ${new Date().toLocaleString("ru-RU")}`,
+    "", ...lines
+  ].join("\n");
+
+  $("review").innerHTML = Q.map((q, i) => {
+    const a = answers[i], ok = a === 0;
+    return `<li class="${ok ? "" : "no"}"><div class="h">${ok ? "✓" : "✗"} Вопрос ${i + 1}</div>
+      <div>${q.t}</div>
+      ${ok ? "" : `<div>Твой ответ: <b>${a === null ? "нет ответа" : q.opts[a].s}</b></div>`}
+      <div>Верный ответ: <b>${q.opts[0].s}</b></div>
+      <div class="ex">${q.ex}</div></li>`;
+  }).join("");
+
+  send({ "Ученица": name, "Результат": `${score} из ${Q.length} (${pct}%)`, "Время": `${t(spent)} из ${t(LIMIT)}${timeout ? " (время вышло)" : ""}`,
+         "Уходила со страницы": String(leaves), "Подробно": lines.join("\n"), _subject: subject, _template: "table" });
+}
+
+function send(payload) {
+  const box = $("send");
+  box.className = "send"; box.textContent = "Отправляю результат учителю…";
+  if (location.protocol === "file:") { fallback("Файл открыт с компьютера, поэтому автоматическая отправка не работает."); return; }
+  fetch(`https://formsubmit.co/ajax/${TEACHER}`, {
+    method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(payload)
+  }).then(r => r.json()).then(j => {
+    if (j.success === true || j.success === "true") { box.className = "send ok"; box.textContent = "Результат отправлен учителю ✓"; }
+    else fallback("Сервис отправки не принял результат.");
+  }).catch(() => fallback("Нет связи с сервисом отправки."));
+}
+function fallback(why) {
+  const box = $("send"); box.className = "send fail";
+  const mail = `mailto:${TEACHER}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(report)}`;
+  box.innerHTML = `<b>${why}</b> Отправь результат сама одной из кнопок:
+    <div class="row"><a class="btn main" href="${mail}" style="text-decoration:none">Отправить письмом</a>
+    <button class="btn" id="copy">Скопировать результат</button></div>`;
+  $("copy").onclick = () => {
+    const done = () => { $("copy").textContent = "Скопировано ✓ Вставь в сообщение учителю"; };
+    if (navigator.clipboard) navigator.clipboard.writeText(report).then(done, legacy); else legacy();
+    function legacy() { const ta = document.createElement("textarea"); ta.value = report; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); done(); }
+  };
+}
+window.addEventListener("beforeunload", e => { if (started && !done) { e.preventDefault(); e.returnValue = ""; } });
+</script>
+</body>
+</html>
